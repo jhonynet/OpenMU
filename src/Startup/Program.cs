@@ -2,6 +2,8 @@
 // Licensed under the MIT License. See LICENSE file in the project root for full license information.
 // </copyright>
 
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+
 namespace MUnique.OpenMU.Startup
 {
     using System;
@@ -153,28 +155,51 @@ namespace MUnique.OpenMU.Startup
             var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
             XmlConfigurator.ConfigureAndWatch(logRepository, new FileInfo(Log4NetConfigFilePath));
 
-            using (new Program(args))
+            using var program = new Program(args);
+            bool exit = false;
+            while (!exit)
             {
-                bool exit = false;
-                while (!exit)
+                var command = Console.ReadLine()?.ToLower();
+                switch (command)
                 {
-                    switch (Console.ReadLine()?.ToLower())
-                    {
-                        case "exit":
-                            exit = true;
-                            break;
-                        case "gc":
-                            GC.Collect();
-                            break;
-                        case null:
-                            Thread.Sleep(1000);
-                            break;
-                        default:
-                            Console.WriteLine("Unknown command");
-                            break;
-                    }
+                    case "exit":
+                        exit = true;
+                        break;
+                    case "gc":
+                        GC.Collect();
+                        break;
+                    case null:
+                        Thread.Sleep(1000);
+                        break;
+                    default:
+                        program.ConsoleCommandHandler(command);
+                        break;
                 }
             }
+        }
+
+        public void ConsoleCommandHandler(string command)
+        {
+            if (!command.StartsWith("!"))
+            {
+                Console.WriteLine("Command not found");
+                return;
+            }
+            var commandArgs = command.Split(" ").Skip(1).ToArray();
+            if (commandArgs.ElementAtOrDefault(0) == null)
+            {
+                Console.WriteLine($"First parameter should be a gameserver id");
+                return;
+            }
+            var gs = this.gameServers.Values.FirstOrDefault(gameserver => gameserver.Id == int.Parse(commandArgs.ElementAt(0)));
+            if (gs == null)
+            {
+                Console.WriteLine($"Gameserver {commandArgs.ElementAt(0)} not found");
+                return;
+            }
+
+            var gsCommand = commandArgs.Skip(1);
+            gs.ConsoleCommandHandler(String.Join(" ", gsCommand));
         }
 
         /// <inheritdoc/>

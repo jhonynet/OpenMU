@@ -167,6 +167,12 @@ namespace MUnique.OpenMU.Interfaces
         /// <param name="playerName">Name of the player.</param>
         /// <returns>True, if the player has been banned; False, otherwise.</returns>
         bool BanPlayer(string playerName);
+
+        /// <summary>
+        /// handle game server window console command
+        /// </summary>
+        /// <param name="command"></param>
+        void ConsoleCommandHandler(string command);
     }
 
     /// <summary>

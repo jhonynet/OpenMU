@@ -430,5 +430,20 @@ namespace MUnique.OpenMU.GameServer
 
             return log4net.ThreadContext.Stacks["gameserver"].Push(this.Id.ToString());
         }
+
+        /// <summary>
+        /// handle main window console commands
+        /// </summary>
+        /// <param name="command"></param>
+        public void ConsoleCommandHandler(string command)
+        {
+            switch (command)
+            {
+                case 
+                default:
+                    Logger.DebugFormat($"[GS:{this.Id}]: Command {command} not found");
+                    break;
+            }
+        }
     }
 }
